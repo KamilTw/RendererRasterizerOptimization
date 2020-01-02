@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Image\TgaBuffer.cpp" />
+    <ClCompile Include="Image\Buffer.cpp" />
+    <ClCompile Include="Rasterizer\Rasterizer.cpp" />
+    <ClCompile Include="Object\Triangle.cpp" />
+    <ClCompile Include="Object\ObjectLoader.cpp" />
+    <ClCompile Include="Object\Model.cpp" />
+    <ClCompile Include="Lights\Light.cpp" />
+    <ClCompile Include="Shaders\Fragment.cpp" />
+    <ClCompile Include="Shaders\VertexProcessor.cpp" />
+    <ClCompile Include="Lights\DirectionalLight.cpp" />
+    <ClCompile Include="Lights\PointLight.cpp" />
+    <ClCompile Include="Lights\SpotLight.cpp" />
+    <ClCompile Include="Textures\TextureLoader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Math\Math.h" />
+    <ClInclude Include="Image\TgaBuffer.h" />
+    <ClInclude Include="Image\ITgaSavable.h" />
+    <ClInclude Include="Image\Buffer.h" />
+    <ClInclude Include="Rasterizer\Rasterizer.h" />
+    <ClInclude Include="Object\Triangle.h" />
+    <ClInclude Include="Object\ObjectLoader.h" />
+    <ClInclude Include="Object\Model.h" />
+    <ClInclude Include="Lights\Light.h" />
+    <ClInclude Include="Shaders\Fragment.h" />
+    <ClInclude Include="Shaders\VertexProcessor.h" />
+    <ClInclude Include="Lights\DirectionalLight.h" />
+    <ClInclude Include="Lights\PointLight.h" />
+    <ClInclude Include="Lights\SpotLight.h" />
+    <ClInclude Include="Textures\TextureLoader.h" />
+  </ItemGroup>
+</Project>
