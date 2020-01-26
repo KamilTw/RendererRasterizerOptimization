@@ -1,14 +1,26 @@
 #include "Fragment.h"
 
-float3 Fragment::calculate(float3& fragPosition, float3& fragNormal, VertexProcessor& vertexProcessor)
+vector<float3> Fragment::calculate(vector<float3>& fragPosition, vector<float3>& fragNormal, vector<float3>& surfacePos, int& counter)
 {
-	float3 color = {0, 0, 0};
-	for (int i = 0; i < lights.size(); i++)
+	vector<vector<float3>> lightColors;
+	lightColors.resize(lights.size());
+
+	vector<float3> allLightColor;
+	allLightColor.resize(counter);
+
+	for (int i = 0; i < lights.size(); ++i)
 	{
-		color += lights[i]->calculate(fragPosition, fragNormal, vertexProcessor);
+		lightColors[i] = lights[i]->calculate(fragPosition, fragNormal, surfacePos, counter);	
 	}
 
-	return color;
+	for (int i = 0; i < lights.size(); ++i)
+	{
+		for (int j = 0; j < counter; ++j)
+		{
+			allLightColor[j] = allLightColor[j] + lightColors[i][j];
+		}
+	}
+	return allLightColor;
 }
 
 float3 Fragment::getPosition()

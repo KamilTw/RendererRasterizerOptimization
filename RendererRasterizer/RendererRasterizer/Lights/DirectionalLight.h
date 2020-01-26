@@ -4,5 +4,5 @@
 class DirectionalLight : public Light
 {
 public:
-	float3 calculate(float3& fragPosition, float3& fragNormal, VertexProcessor& vertexProcessor);
+	vector<float3> calculate(vector<float3>& fragPosition, vector<float3>& fragNormal, vector<float3>& surfacePos, int& counter);
 };

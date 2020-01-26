@@ -15,6 +15,40 @@ float3 VertexProcessor::toProj(float3& v, float w)
 	}
 }
 
+vector<float3> VertexProcessor::toProj(vector<float3>& v, float w)
+{
+	float4x4 m = view2proj * world2view * obj2world;
+	vector<float4> vv;
+	vv.reserve(v.size());
+	for (int i = 0; i < v.size(); ++i)
+	{
+		vv[i] = float4{ v[i].x, v[i].y, v[i].z, w };
+	}
+
+	 vector<float4> r = mulN(m, vv, v.size());
+
+	vector<float3> rr;
+	rr.reserve(v.size());
+
+	if (w == 1)
+	{
+		for (int i = 0; i < v.size(); ++i)
+		{
+			rr[i] = float3{ r[i].x / r[i].w , r[i].y / r[i].w , r[i].z / r[i].w };
+		}
+	}
+	else
+	{
+		for (int i = 0; i < v.size(); ++i)
+		{
+			rr[i] = float3{ r[i].x , r[i].y , r[i].z };
+		}
+	}
+
+	return rr;
+}
+
+
 float3 VertexProcessor::toView(float3 v, float w)
 {
 	//float4 r = world2view * obj2world * float4{ v.x, v.y, v.z, w };
@@ -28,6 +62,38 @@ float3 VertexProcessor::toView(float3 v, float w)
 	{
 		return float3{ r.x , r.y, r.z };
 	}
+}
+
+vector<float3> VertexProcessor::toView(vector<float3>& v, float w, int counter)
+{
+	vector<float4> vv;
+	vv.reserve(counter);
+	for (int i = 0; i < counter; ++i)
+	{
+		vv[i] = float4{ v[i].x, v[i].y, v[i].z, w };
+	}
+
+	vector<float4> r = mulN(world2view, vv, counter);
+
+	vector<float3> rr;
+	rr.reserve(counter);
+
+	if (w == 1)
+	{
+		for (int i = 0; i < counter; ++i)
+		{
+			rr[i] = float3{ r[i].x / r[i].w , r[i].y / r[i].w , r[i].z / r[i].w };
+		}
+	}
+	else
+	{
+		for (int i = 0; i < counter; ++i)
+		{
+			rr[i] = float3{ r[i].x , r[i].y , r[i].z };
+		}
+	}
+
+	return rr;
 }
 
 float3 VertexProcessor::toWorld(float3 v, float w)

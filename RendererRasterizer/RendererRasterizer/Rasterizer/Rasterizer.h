@@ -10,6 +10,20 @@
 
 using namespace std;
 
+struct interpolationInfo
+{
+	float l1;
+	float l2;
+	float l3;
+	int index;
+};
+
+struct pixelInfo
+{
+	int x;
+	int y;
+};
+
 class Rasterizer
 {
 private:
@@ -19,19 +33,34 @@ private:
 
 public:
 	Rasterizer(Buffer *buffer);
+	double time_span = 0;
+	vector<interpolationInfo> interpolationInfos;
+	vector<pixelInfo> pixelInfos;
+	int counter = 0;
+	bool isTextureIncluded;
+	float imageWidth;
+	float imageHeight;
 
-	void drawTriangle(float3& v1, float3& v2, float3& v3, float3& c1, float3& c2, float3& c3, float3& n1, float3& n2, float3& n3, float3& tn1, float3& tn2, float3& tn3, Buffer* texture);
 	void draw(Model* model, VertexProcessor& vp, Buffer* texture);
-	void draw(Triangle* triangle);
+	vector<float3> executeVP(vector<float3>& vertices, int w);
+	void findPixelInfo(Model* model, vector<float3>& verticesAfterVP);
+	vector<float3> calculateFragPositions(Model* model, vector<float3>& verticesAfterVP);
+	vector<float3> calculateFragNormals(Model* model, vector<float3>& normalsAfterVP);
+	vector<float3> calculateLightNormals(vector<float3>& fragNormals);
+	vector<float3> calculateSurfacePositions(vector<float3>& fragNormals);
+	vector<float3> interpolateColor(Model* model, Buffer* texture);
+	vector<float3> calculateColorPerPixel(vector<float3>& v, vector<float3>& c, vector<float3>& n, vector<float3>& surfacePos);
+	void maxToOne(vector<float3>& color);
+	void setBufferColor(vector<float3>& color);
+	float3 interpolate(float3& v1, float3& v2, float3& v3, float& l1, float& l2, float& l3);
+	float interpolateUV(float& v1, float& v2, float& v3, float& l1, float& l2, float& l3);
 
 	float xToCanonicalView(float& x);
 	float yToCanonicalView(float& y);
 
 	float3 calculateColorPerVertex(float3& v, float3& c, float3& n);
-	float3 interpolateColor(float3& c1Fragment, float3& c2Fragment, float3& c3Fragment, float& l1, float& l2, float& l3);
-	float3 calculateColorPerPixel(float3& v1, float3& v2, float3& v3, float3& c1, float3& c2, float3& c3, float3& n1, float3& n2, float3& n3, float& l1, float& l2, float& l3, float3& tn1, float3& tn2, float3& tn3, Buffer* texture);
 
-	void maxToOne(float3& color);
+
 	void addLight(Light* light);
 	void setVp(VertexProcessor& vp);
 };

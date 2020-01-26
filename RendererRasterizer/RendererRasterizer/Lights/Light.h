@@ -24,7 +24,7 @@ private:
 	float outerCutoff;
 
 public:
-	virtual float3 calculate(float3& fragPosition, float3& fragNormal, VertexProcessor& vertexProcessor);
+	virtual vector<float3> calculate(vector<float3>& fragPosition, vector<float3>& fragNormal, vector<float3>& surfacePos, int& counter);
 
 	float3 getPosition();
 	float3 getDirection();

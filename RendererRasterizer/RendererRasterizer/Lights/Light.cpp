@@ -1,8 +1,9 @@
 #include "Light.h"
 
-float3 Light::calculate(float3& fragPosition, float3& fragNormal, VertexProcessor& vertexProcessor)
+vector<float3> Light::calculate(vector<float3>& fragPosition, vector<float3>& fragNormal, vector<float3>& surfacePos, int& counter)
 {
-	return float3{ 0, 0, 0 };
+	vector<float3> v;
+	return v;
 }
 
 float3 Light::getPosition()

@@ -11,7 +11,9 @@ private:
 
 public:
 	float3 toProj(float3& v, float w);
+	vector<float3> toProj(vector<float3>& v, float w);
 	float3 toView(float3 v, float w);
+	vector<float3> toView(vector<float3>& v, float w, int counter);
 	float3 toWorld(float3 v, float w);
 	void lt(Model* model);
 	void lt(Triangle* triangle);
