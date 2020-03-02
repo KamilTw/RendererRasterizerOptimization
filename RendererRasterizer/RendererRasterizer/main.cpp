@@ -11,15 +11,10 @@
 #include "Lights/SpotLight.h"
 #include "Textures/TextureLoader.h"
 
-#include <ratio>
-#include <chrono>
-
-using namespace std::chrono;
-
 int main()
 {
 	std::clock_t start;
-	double durationn;
+	double duration;
 	start = std::clock();
 
 	TgaBuffer *colorBuffer = new TgaBuffer(512, 512);
@@ -65,8 +60,6 @@ int main()
 	rasterizer.addLight(spotLight1);
 
 	// Object loader
-	double time_span = 0;
-
 	ObjectLoader loader = ObjectLoader();
 	Model box = loader.loadObject("box");
 	Model sphere = loader.loadObject("sphere16");
@@ -119,20 +112,8 @@ int main()
 	vp.multByTranslation(float3{ 0.0f, -1.0f, -10.0f });
 	rasterizer.draw(&box, vp, NULL);
 
-	//cout << rasterizer.time_span << endl;
-	
-	// 0.0005    -7
-	// 
-
-
-
-
-	
-	cout << time_span << endl;
-
-
 	colorBuffer->save("Image.tga");
 
-	durationn = (std::clock() - start) / (double)CLOCKS_PER_SEC;
-	printf("\n \nRendered in %f seconds (%f fps) \n", durationn, 1 / durationn);
+	duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+	printf("\n \nRendered in %f seconds (%f fps) \n", duration, 1 / duration);
 }

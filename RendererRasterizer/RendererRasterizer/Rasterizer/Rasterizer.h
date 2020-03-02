@@ -30,17 +30,15 @@ private:
 	Buffer *buffer;
 	Fragment fragment;
 	VertexProcessor vp;
-
-public:
-	Rasterizer(Buffer *buffer);
-	double time_span = 0;
 	vector<interpolationInfo> interpolationInfos;
 	vector<pixelInfo> pixelInfos;
-	int counter = 0;
+	int pixelInfosCounter = 0;
 	bool isTextureIncluded;
 	float imageWidth;
 	float imageHeight;
 
+public:
+	Rasterizer(Buffer *buffer);
 	void draw(Model* model, VertexProcessor& vp, Buffer* texture);
 	vector<float3> executeVP(vector<float3>& vertices, int w);
 	void findPixelInfo(Model* model, vector<float3>& verticesAfterVP);
@@ -58,8 +56,7 @@ public:
 	float xToCanonicalView(float& x);
 	float yToCanonicalView(float& y);
 
-	float3 calculateColorPerVertex(float3& v, float3& c, float3& n);
-
+	//float3 calculateColorPerVertex(float3& v, float3& c, float3& n);
 
 	void addLight(Light* light);
 	void setVp(VertexProcessor& vp);

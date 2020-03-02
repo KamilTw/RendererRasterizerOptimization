@@ -1,10 +1,5 @@
 #include "Rasterizer.h"
 
-#include <ratio>
-#include <chrono>
-
-using namespace std::chrono;
-
 Rasterizer::Rasterizer(Buffer * buffer)
 {
 	this->buffer = buffer;
@@ -19,7 +14,7 @@ Rasterizer::Rasterizer(Buffer * buffer)
 void Rasterizer::draw(Model* model, VertexProcessor& vp, Buffer* texture)
 {
 	setVp(vp);
-	counter = 0;
+	pixelInfosCounter = 0;
 	if (texture != NULL)
 	{
 		isTextureIncluded = true;
@@ -60,8 +55,6 @@ vector<float3> Rasterizer::executeVP(vector<float3>& v, int w)
 
 void Rasterizer::findPixelInfo(Model* model, vector<float3>& verticesAfterVP)
 {
-	//high_resolution_clock::time_point t1 = high_resolution_clock::now();
-
 	for (int i = 0; i < model->getIndexesAmount(); ++i)
 	{
 		// From 0-1 to image resolution
@@ -132,25 +125,22 @@ void Rasterizer::findPixelInfo(Model* model, vector<float3>& verticesAfterVP)
 
 						buffer->setDepth(x, y, depth);
 
-						interpolationInfos[counter] = interpolationInfo{ l1, l2, l3, i };
-						pixelInfos[counter] = pixelInfo{ x, y };
-						counter++;
+						interpolationInfos[pixelInfosCounter] = interpolationInfo{ l1, l2, l3, i };
+						pixelInfos[pixelInfosCounter] = pixelInfo{ x, y };
+						pixelInfosCounter++;
 					}
 				}
 			}
 		}
 	}
-
-	//high_resolution_clock::time_point t2 = high_resolution_clock::now();
-	//time_span += duration_cast<duration<double>>(t2 - t1).count();
 }
 
 vector<float3> Rasterizer::calculateFragPositions(Model* model, vector<float3>& verticesAfterVP)
 {
 	vector<float3> fragPositions;
-	fragPositions.reserve(counter);
+	fragPositions.reserve(pixelInfosCounter);
 	int i;
-	for (int j = 0; j < counter; ++j)
+	for (int j = 0; j < pixelInfosCounter; ++j)
 	{
 		i = interpolationInfos[j].index;
 		float3 fragPosition = (interpolate(verticesAfterVP[model->vIndexes[i].a], verticesAfterVP[model->vIndexes[i].b], verticesAfterVP[model->vIndexes[i].c], interpolationInfos[j].l1, interpolationInfos[j].l2, interpolationInfos[j].l3));
@@ -164,9 +154,9 @@ vector<float3> Rasterizer::calculateFragPositions(Model* model, vector<float3>& 
 vector<float3> Rasterizer::calculateFragNormals(Model* model, vector<float3>& normalsAfterVP)
 {
 	vector<float3> fragNormals;
-	fragNormals.reserve(counter);
+	fragNormals.reserve(pixelInfosCounter);
 	int i;
-	for (int j = 0; j < counter; ++j)
+	for (int j = 0; j < pixelInfosCounter; ++j)
 	{
 		i = interpolationInfos[j].index;
 		fragNormals[j] = (interpolate(normalsAfterVP[model->nIndexes[i].a], normalsAfterVP[model->nIndexes[i].b], normalsAfterVP[model->nIndexes[i].c], interpolationInfos[j].l1, interpolationInfos[j].l2, interpolationInfos[j].l3));
@@ -178,9 +168,9 @@ vector<float3> Rasterizer::calculateFragNormals(Model* model, vector<float3>& no
 vector<float3> Rasterizer::calculateLightNormals(vector<float3>& fragNormals)
 {
 	vector<float3> lightNormals;
-	lightNormals.resize(counter);
+	lightNormals.resize(pixelInfosCounter);
 	int i;
-	for (int j = 0; j < counter; ++j)
+	for (int j = 0; j < pixelInfosCounter; ++j)
 	{
 		float3 N = vp.toView(fragNormals[j], 0);
 		N.normalize();
@@ -193,9 +183,9 @@ vector<float3> Rasterizer::calculateLightNormals(vector<float3>& fragNormals)
 vector<float3> Rasterizer::calculateSurfacePositions(vector<float3>& fragNormals)
 {
 	vector<float3> surfacePositions;
-	surfacePositions.reserve(counter);
+	surfacePositions.reserve(pixelInfosCounter);
 	int i;
-	for (int j = 0; j < counter; ++j)
+	for (int j = 0; j < pixelInfosCounter; ++j)
 	{
 		float3 surfacePos = vp.toWorld(-fragNormals[j], 1);
 		surfacePositions[j] = surfacePos;
@@ -207,20 +197,20 @@ vector<float3> Rasterizer::calculateSurfacePositions(vector<float3>& fragNormals
 vector<float3> Rasterizer::interpolateColor(Model* model, Buffer* texture)
 {
 	vector<float3> interpolatedColor;
-	interpolatedColor.reserve(counter);
+	interpolatedColor.reserve(pixelInfosCounter);
 	int i;
 	if (isTextureIncluded)
 	{
 		vector<float> interpolatedU;
-		interpolatedU.reserve(counter);
+		interpolatedU.reserve(pixelInfosCounter);
 		vector<float> interpolatedV;
 		vector<int> rows;
-		rows.reserve(counter);
+		rows.reserve(pixelInfosCounter);
 		vector<int> columns;
-		columns.reserve(counter);
-		interpolatedV.reserve(counter);
+		columns.reserve(pixelInfosCounter);
+		interpolatedV.reserve(pixelInfosCounter);
 
-		for (int j = 0; j < counter; ++j)
+		for (int j = 0; j < pixelInfosCounter; ++j)
 		{
 			i = interpolationInfos[j].index;
 			interpolatedU[j] = (interpolateUV(model->texturesVertices[model->tIndexes[i].a].x, model->texturesVertices[model->tIndexes[i].b].x, model->texturesVertices[model->tIndexes[i].c].x, interpolationInfos[j].l1, interpolationInfos[j].l2, interpolationInfos[j].l3));
@@ -229,19 +219,19 @@ vector<float3> Rasterizer::interpolateColor(Model* model, Buffer* texture)
 
 		float textureHeight = (texture->getHeight() - 1);
 		float textreWidth = (texture->getWidth() - 1);
-		for (int j = 0; j < counter; ++j)
+		for (int j = 0; j < pixelInfosCounter; ++j)
 		{
 			columns[j] = (int)(textureHeight * interpolatedV[j]);
 			rows[j] = (int)(textreWidth * interpolatedU[j]);
 		}
-		for (int j = 0; j < counter; ++j)
+		for (int j = 0; j < pixelInfosCounter; ++j)
 		{
 			interpolatedColor[j] = texture->getPixelColor(rows[j], columns[j]);
 		}
 	}
 	else
 	{
-		for (int j = 0; j < counter; ++j)
+		for (int j = 0; j < pixelInfosCounter; ++j)
 		{
 			i = interpolationInfos[j].index;
 			interpolatedColor[j] = (interpolate(model->materials[model->mIndexes[i]].kd, model->materials[model->mIndexes[i]].kd, model->materials[model->mIndexes[i]].kd, interpolationInfos[j].l1, interpolationInfos[j].l2, interpolationInfos[j].l3));
@@ -253,9 +243,9 @@ vector<float3> Rasterizer::interpolateColor(Model* model, Buffer* texture)
 
 vector<float3> Rasterizer::calculateColorPerPixel(vector<float3>& v, vector<float3>& c, vector<float3>& n, vector<float3>& surfacePos)
 {
-	vector<float3> allLightsColor = fragment.calculate(v, n, surfacePos, counter);
+	vector<float3> allLightsColor = fragment.calculate(v, n, surfacePos, pixelInfosCounter);
 
-	for (int i = 0; i < counter; ++i)
+	for (int i = 0; i < pixelInfosCounter; ++i)
 	{
 		allLightsColor[i] = c[i] * allLightsColor[i];
 	}
@@ -279,7 +269,7 @@ void Rasterizer::maxToOne(vector<float3>& color)
 
 void Rasterizer::setBufferColor(vector<float3>& color)
 {
-	for (int j = 0; j < counter; ++j)
+	for (int j = 0; j < pixelInfosCounter; ++j)
 	{
 		buffer->setPixelColor(pixelInfos[j].x, pixelInfos[j].y, color[j]);
 	}
@@ -305,13 +295,13 @@ float Rasterizer::yToCanonicalView(float& y)
 	return (y + 1) * imageHeight * 0.5f;
 }
 
-float3 Rasterizer::calculateColorPerVertex(float3& v, float3& c, float3& n)
+/*float3 Rasterizer::calculateColorPerVertex(float3& v, float3& c, float3& n)
 {
 	//float3 cFragment = float3{ c.r, c.g, c.b } * fragment.calculate(v, n, vp);
 	float3 cFragment;
 
 	return cFragment;
-}
+}*/
 
 void Rasterizer::addLight(Light* light)
 {
