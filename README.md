@@ -4,8 +4,7 @@ was optimizaed **from 11.8 to 20.9 fps** (frames per second) on average. It **in
 Different optimization techniques was used.
 </br>
 
-1. Data-oriented design
-Using vectors to store most of the data. Vectors allow data addresses to be sequential. Calculations are exectured iterating
+1. Data-oriented design. Using vectors to store most of the data. Vectors allow data addresses to be sequential. Calculations are exectured iterating
 on simillar data at one time. It allows to decrease cache misses and process data more efficient.
 </br>
 
